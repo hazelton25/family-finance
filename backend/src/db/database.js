@@ -51,6 +51,35 @@ db.run(`
   );
   CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 `);
+-- FEATURE A: Family Member Tagging
+CREATE TABLE IF NOT EXISTS members (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    color TEXT NOT NULL -- e.g., '#FF6B6B'
+);
+-- (Run this safely to patch the existing ledger table)
+ALTER TABLE transactions ADD COLUMN paid_by TEXT REFERENCES members(id);
+
+-- FEATURE C: Sinking Funds / Long-Term Goals
+CREATE TABLE IF NOT EXISTS goals (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    target_amount REAL NOT NULL,
+    current_amount REAL DEFAULT 0.0,
+    target_date TEXT, -- 'YYYY-MM-DD'
+    emoji TEXT DEFAULT '🎯',
+    color TEXT DEFAULT '#4ECDC4'
+);
+-- FEATURE D: Scheduled "Ghost" Subscriptions
+CREATE TABLE IF NOT EXISTS recurring_bills (
+    id TEXT PRIMARY KEY,
+    payee TEXT NOT NULL,
+    amount REAL NOT NULL,
+    category_id TEXT NOT NULL,
+    paid_by TEXT REFERENCES members(id),
+    day_of_month INTEGER NOT NULL, -- 1 through 31
+    last_processed_month TEXT      -- e.g., '2026-06' to prevent double-charging
+);
 save();
 
 export function all(sql, params = []) {
