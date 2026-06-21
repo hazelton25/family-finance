@@ -1,0 +1,23 @@
+# data — never commit the household database
+data/
+*.db
+*.sqlite
+
+# deps
+node_modules/
+**/node_modules/
+
+# build output
+frontend/dist/
+**/dist/
+
+# env
+.env
+.env.local
+
+# os / editor
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/

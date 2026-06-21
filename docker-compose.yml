@@ -1,0 +1,37 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: family-finance-api
+    restart: unless-stopped
+    environment:
+      - DB_PATH=/data
+      - NODE_ENV=production
+      - PORT=3001
+    volumes:
+      # Persistent database — survives restarts, reboots, and rebuilds.
+      # NEVER run `docker compose down -v` or this directory will be wiped.
+      - ./data:/data
+    networks:
+      - app
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: family-finance-ui
+    restart: unless-stopped
+    ports:
+      # host:container — host 3002 chosen to avoid clashing with other
+      # self-hosted apps (e.g. OpenWebUI on 3000). Change the left number
+      # if 3002 is taken on your machine.
+      - "${HOST_PORT:-3002}:3000"
+    depends_on:
+      - backend
+    networks:
+      - app
+
+networks:
+  app:
+    driver: bridge
